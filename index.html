@@ -14,14 +14,43 @@
 </head>
 <body>
   <div class="card">
-    <h1>หน้า index ทดสอบ</h1>
-    <p>สวัสดี — นี่คือหน้า HTML ทดสอบสำหรับ workspace นี้</p>
-    <p id="time"></p>
+    <h1>ไฟล์ PDF (แบบทดสอบ)</h1>
+    <p>วางไฟล์ PDF ลงในโฟลเดอร์ `pdfs` แล้วรีเฟรชหน้านี้</p>
+    <div id="list">กำลังโหลดรายการไฟล์...</div>
     <a class="button" href="#" id="reload">รีเฟรช</a>
   </div>
   <script>
-    document.getElementById('time').textContent = 'เวลา: ' + new Date().toLocaleString('th-TH');
-    document.getElementById('reload').addEventListener('click', function(e){ e.preventDefault(); location.reload(); });
+    function fmtSize(n){ if(n<1024) return n+' B'; if(n<1024*1024) return (n/1024).toFixed(1)+' KB'; return (n/1024/1024).toFixed(2)+' MB'; }
+    async function load(){
+      const listEl = document.getElementById('list');
+      listEl.textContent = 'กำลังโหลดรายการไฟล์...';
+      try{
+        const res = await fetch('/api/files');
+        if(!res.ok) throw new Error(res.statusText);
+        const files = await res.json();
+        if(!files.length){ listEl.innerHTML = '<p>ไม่พบไฟล์ PDF ในโฟลเดอร์</p>'; return; }
+        const ul = document.createElement('div');
+        ul.style.textAlign = 'left';
+        files.forEach(f=>{
+          const row = document.createElement('div');
+          row.style.display='flex'; row.style.justifyContent='space-between'; row.style.alignItems='center'; row.style.padding='8px 0'; row.style.borderBottom='1px solid #eef2f7';
+          const left = document.createElement('div');
+          const name = document.createElement('div'); name.textContent = f.name; name.style.fontWeight='600';
+          const meta = document.createElement('div'); meta.textContent = fmtSize(f.size) + ' • ' + new Date(f.mtime).toLocaleString('th-TH'); meta.style.color='#6b7280'; meta.style.fontSize='13px';
+          left.appendChild(name); left.appendChild(meta);
+          const actions = document.createElement('div');
+          const preview = document.createElement('a'); preview.href = '/pdfs/' + encodeURIComponent(f.name); preview.target='_blank'; preview.textContent='Preview'; preview.style.marginRight='8px'; preview.style.color='#2563eb';
+          const dl = document.createElement('a'); dl.href = '/pdfs/' + encodeURIComponent(f.name); dl.download = f.name; dl.textContent='Download'; dl.style.color='#059669';
+          actions.appendChild(preview); actions.appendChild(dl);
+          row.appendChild(left); row.appendChild(actions);
+          ul.appendChild(row);
+        });
+        listEl.innerHTML = '';
+        listEl.appendChild(ul);
+      }catch(err){ listEl.innerHTML = '<p>เกิดข้อผิดพลาด: '+err.message+'</p>'; }
+    }
+    document.getElementById('reload').addEventListener('click', function(e){ e.preventDefault(); load(); });
+    load();
   </script>
 </body>
 </html>

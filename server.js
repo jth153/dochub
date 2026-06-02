@@ -1,0 +1,38 @@
+const express = require('express');
+const cors = require('cors');
+const fs = require('fs').promises;
+const path = require('path');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+const PDF_DIR = path.join(__dirname, 'pdfs');
+
+app.use(cors());
+app.use(express.static(path.join(__dirname)));
+
+app.get('/api/files', async (req, res) => {
+  try{
+    await fs.access(PDF_DIR);
+  }catch(err){ return res.json([]); }
+  try{
+    const names = await fs.readdir(PDF_DIR);
+    const files = [];
+    for(const name of names){
+      const full = path.join(PDF_DIR, name);
+      const stat = await fs.stat(full);
+      if(stat.isFile() && path.extname(name).toLowerCase() === '.pdf'){
+        files.push({ name, size: stat.size, mtime: stat.mtime });
+      }
+    }
+    files.sort((a,b)=> b.mtime - a.mtime);
+    res.json(files);
+  }catch(err){ res.status(500).json({error: err.message}); }
+});
+
+// Serve PDFs at /pdfs/*
+app.use('/pdfs', express.static(PDF_DIR, { index: false }));
+
+app.listen(PORT, ()=>{
+  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`PDF folder: ${PDF_DIR}`);
+});

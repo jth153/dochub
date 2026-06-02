@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>หน้า index ทดสอบ</title>
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Helvetica Neue", Arial; display:flex; align-items:center; justify-content:center; height:100vh; margin:0; background:#f6f8fb; color:#111; }
+    .card { background:#fff; padding:2rem; border-radius:12px; box-shadow:0 6px 20px rgba(15,23,42,0.08); text-align:center; max-width:640px; }
+    h1 { margin:0 0 .5rem; }
+    p { margin:.25rem 0; color:#374151; }
+    a.button { display:inline-block; margin-top:1rem; padding:.5rem 1rem; background:#2563eb; color:#fff; border-radius:8px; text-decoration:none; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>หน้า index ทดสอบ</h1>
+    <p>สวัสดี — นี่คือหน้า HTML ทดสอบสำหรับ workspace นี้</p>
+    <p id="time"></p>
+    <a class="button" href="#" id="reload">รีเฟรช</a>
+  </div>
+  <script>
+    document.getElementById('time').textContent = 'เวลา: ' + new Date().toLocaleString('th-TH');
+    document.getElementById('reload').addEventListener('click', function(e){ e.preventDefault(); location.reload(); });
+  </script>
+</body>
+</html>

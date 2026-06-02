@@ -3,54 +3,185 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>หน้า index ทดสอบ</title>
+  <title>PDF Drive - ทดสอบ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Helvetica Neue", Arial; display:flex; align-items:center; justify-content:center; height:100vh; margin:0; background:#f6f8fb; color:#111; }
-    .card { background:#fff; padding:2rem; border-radius:12px; box-shadow:0 6px 20px rgba(15,23,42,0.08); text-align:center; max-width:640px; }
-    h1 { margin:0 0 .5rem; }
-    p { margin:.25rem 0; color:#374151; }
-    a.button { display:inline-block; margin-top:1rem; padding:.5rem 1rem; background:#2563eb; color:#fff; border-radius:8px; text-decoration:none; }
+    :root{
+      --bg:#f8fafc;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --accent:#2563eb;
+      --success:#10b981;
+      --glass: rgba(2,6,23,0.03);
+    }
+    html,body{height:100%;}
+    body{margin:0;font-family:'Inter', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Arial;background:linear-gradient(180deg,#f8fafc 0%, #ffffff 100%);color:#0b1220;display:flex;align-items:flex-start;justify-content:center;padding:32px;box-sizing:border-box}
+    .app{width:100%;max-width:1100px}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#7c3aed);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff}
+    h1{font-size:18px;margin:0;color:#071028}
+    .controls{display:flex;gap:12px;align-items:center}
+    .search{display:flex;align-items:center;background:rgba(15,23,42,0.04);padding:8px 12px;border-radius:10px;gap:8px}
+    .search input{background:transparent;border:0;outline:0;color:#0b1220;min-width:220px}
+    select, .btn{background:#fff;border:1px solid rgba(15,23,42,0.06);color:#0b1220;padding:8px 10px;border-radius:8px}
+    .btn{cursor:pointer}
+
+    main{background:var(--card);padding:18px;border-radius:12px;border:1px solid rgba(15,23,42,0.04);box-shadow:0 6px 20px rgba(15,23,42,0.04)}
+    .meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .stats{color:var(--muted);font-size:13px}
+
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+    .tile{background:#fff;padding:14px;border-radius:10px;border:1px solid rgba(15,23,42,0.04);display:flex;flex-direction:column;gap:8px}
+    .thumb{height:130px;background:linear-gradient(180deg,#f3f4f6,#ffffff);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-weight:600}
+    .name{font-weight:600;color:#071028;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .sub{color:var(--muted);font-size:13px}
+    .actions{display:flex;gap:8px;margin-top:auto}
+    .link{color:var(--accent);text-decoration:none;padding:8px 10px;border-radius:8px;border:1px solid rgba(37,99,235,0.08);background:rgba(37,99,235,0.03)}
+    .download{color:var(--success);text-decoration:none;padding:8px 10px;border-radius:8px;border:1px solid rgba(16,185,129,0.06);background:rgba(16,185,129,0.03)}
+    .copybtn{background:#fff;border:1px solid rgba(15,23,42,0.04);padding:8px 10px;border-radius:8px;color:#0b1220;cursor:pointer}
+
+    .empty{padding:32px;text-align:center;color:var(--muted)}
+
+    /* modal */
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,0.45);z-index:60}
+    .modal.open{display:flex}
+    .modal-content{width:90%;max-width:960px;height:80%;background:#ffffff;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(15,23,42,0.12)}
+    .modal-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid rgba(15,23,42,0.04)}
+    .modal-body{flex:1;background:#fff}
+    .close{background:transparent;border:0;color:var(--muted);cursor:pointer}
+
+    @media (max-width:640px){body{padding:16px}.search input{min-width:120px}}
+
+    @media (max-width:480px){
+      .grid{grid-template-columns:1fr}
+      .modal-content{width:100%;height:100%;border-radius:0}
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>ไฟล์ PDF (แบบทดสอบ)</h1>
-    <p>วางไฟล์ PDF ลงในโฟลเดอร์ `pdfs` แล้วรีเฟรชหน้านี้</p>
-    <div id="list">กำลังโหลดรายการไฟล์...</div>
-    <a class="button" href="#" id="reload">รีเฟรช</a>
+  <div class="app">
+    <header>
+      <div class="brand">
+        <div class="logo">PD</div>
+        <div>
+          <h1>PDF Drive - ตัวอย่าง</h1>
+          <div class="sub" style="color:var(--muted)">วางไฟล์ในโฟลเดอร์ `pdfs` แล้วรีเฟรช</div>
+        </div>
+      </div>
+      <div class="controls">
+        <div class="search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 21l-4.35-4.35" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11" cy="11" r="6" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <input id="q" placeholder="ค้นหาไฟล์..." />
+        </div>
+        <select id="sort">
+          <option value="mtime">ล่าสุด</option>
+          <option value="name">ชื่อ</option>
+          <option value="size">ขนาด</option>
+        </select>
+        <button class="btn" id="reload">รีเฟรช</button>
+      </div>
+    </header>
+
+    <main>
+      <div class="meta"><div class="stats" id="stats">กำลังโหลด...</div></div>
+      <div id="grid" class="grid"></div>
+      <div id="empty" class="empty" style="display:none">ไม่พบไฟล์ PDF ในโฟลเดอร์</div>
+    </main>
   </div>
+
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div id="modal-title"></div>
+        <div>
+          <button class="close" id="modal-close">ปิด ✕</button>
+        </div>
+      </div>
+      <div class="modal-body"><iframe id="pdf-frame" src="" style="width:100%;height:100%;border:0"></iframe></div>
+    </div>
+  </div>
+
   <script>
     function fmtSize(n){ if(n<1024) return n+' B'; if(n<1024*1024) return (n/1024).toFixed(1)+' KB'; return (n/1024/1024).toFixed(2)+' MB'; }
-    async function load(){
-      const listEl = document.getElementById('list');
-      listEl.textContent = 'กำลังโหลดรายการไฟล์...';
-      try{
-        const res = await fetch('/api/files');
-        if(!res.ok) throw new Error(res.statusText);
-        const files = await res.json();
-        if(!files.length){ listEl.innerHTML = '<p>ไม่พบไฟล์ PDF ในโฟลเดอร์</p>'; return; }
-        const ul = document.createElement('div');
-        ul.style.textAlign = 'left';
-        files.forEach(f=>{
-          const row = document.createElement('div');
-          row.style.display='flex'; row.style.justifyContent='space-between'; row.style.alignItems='center'; row.style.padding='8px 0'; row.style.borderBottom='1px solid #eef2f7';
-          const left = document.createElement('div');
-          const name = document.createElement('div'); name.textContent = f.name; name.style.fontWeight='600';
-          const meta = document.createElement('div'); meta.textContent = fmtSize(f.size) + ' • ' + new Date(f.mtime).toLocaleString('th-TH'); meta.style.color='#6b7280'; meta.style.fontSize='13px';
-          left.appendChild(name); left.appendChild(meta);
-          const actions = document.createElement('div');
-          const preview = document.createElement('a'); preview.href = '/pdfs/' + encodeURIComponent(f.name); preview.target='_blank'; preview.textContent='Preview'; preview.style.marginRight='8px'; preview.style.color='#2563eb';
-          const dl = document.createElement('a'); dl.href = '/pdfs/' + encodeURIComponent(f.name); dl.download = f.name; dl.textContent='Download'; dl.style.color='#059669';
-          actions.appendChild(preview); actions.appendChild(dl);
-          row.appendChild(left); row.appendChild(actions);
-          ul.appendChild(row);
-        });
-        listEl.innerHTML = '';
-        listEl.appendChild(ul);
-      }catch(err){ listEl.innerHTML = '<p>เกิดข้อผิดพลาด: '+err.message+'</p>'; }
+    let filesCache = [];
+
+    async function fetchFiles(){
+      const res = await fetch('/api/files');
+      if(!res.ok) throw new Error(res.statusText);
+      const files = await res.json();
+      filesCache = files.map(f=>({ ...f, mtime: new Date(f.mtime) }));
+      render();
     }
-    document.getElementById('reload').addEventListener('click', function(e){ e.preventDefault(); load(); });
-    load();
+
+    function render(){
+      const q = document.getElementById('q').value.trim().toLowerCase();
+      const sort = document.getElementById('sort').value;
+      let items = filesCache.slice();
+      if(q) items = items.filter(f=>f.name.toLowerCase().includes(q));
+      if(sort==='mtime') items.sort((a,b)=> b.mtime - a.mtime);
+      if(sort==='name') items.sort((a,b)=> a.name.localeCompare(b.name));
+      if(sort==='size') items.sort((a,b)=> b.size - a.size);
+
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '';
+      if(!items.length){ document.getElementById('empty').style.display='block'; document.getElementById('stats').textContent='0 ไฟล์'; return; }
+      document.getElementById('empty').style.display='none';
+      document.getElementById('stats').textContent = items.length + ' ไฟล์ • ' + (filesCache.length ? 'ทั้งหมด ' + filesCache.length : '');
+
+      items.forEach(f=>{
+        const t = document.createElement('div'); t.className='tile';
+        const th = document.createElement('div'); th.className='thumb'; th.textContent='PDF';
+        const name = document.createElement('div'); name.className='name'; name.title = f.name; name.textContent = f.name;
+        const meta = document.createElement('div'); meta.className='sub'; meta.textContent = fmtSize(f.size) + ' • ' + f.mtime.toLocaleString('th-TH');
+        const actions = document.createElement('div'); actions.className='actions';
+        const preview = document.createElement('a'); preview.href='#'; preview.className='link'; preview.textContent='ดูตัวอย่าง'; preview.addEventListener('click', (e)=>{ e.preventDefault(); openPreview(f.name); });
+        const copy = document.createElement('button'); copy.className='copybtn'; copy.textContent='คัดลอกลิงก์'; copy.addEventListener('click', (e)=>{ e.preventDefault(); copyLink(f.name, copy); });
+        const dl = document.createElement('a'); dl.href = '/pdfs/' + encodeURIComponent(f.name); dl.className='download'; dl.textContent='ดาวน์โหลด'; dl.setAttribute('download', f.name);
+        actions.appendChild(preview); actions.appendChild(copy); actions.appendChild(dl);
+        t.appendChild(th); t.appendChild(name); t.appendChild(meta); t.appendChild(actions);
+        grid.appendChild(t);
+      });
+    }
+
+    function copyLink(name, btn){
+      const url = window.location.origin + '/pdfs/' + encodeURIComponent(name);
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(url).then(()=>{
+          const old = btn.textContent;
+          btn.textContent = 'คัดลอกแล้ว';
+          setTimeout(()=> btn.textContent = old, 1500);
+        }).catch(()=>{ alert('ไม่สามารถคัดลอกได้'); });
+      }else{
+        // fallback
+        const ta = document.createElement('textarea'); ta.value = url; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); alert('คัดลอกแล้ว'); }catch(e){ alert('ไม่สามารถคัดลอกได้'); } ta.remove();
+      }
+    }
+
+    function openPreview(name){
+      const frame = document.getElementById('pdf-frame');
+      const modal = document.getElementById('modal');
+      document.getElementById('modal-title').textContent = name;
+      frame.src = '/pdfs/' + encodeURIComponent(name);
+      modal.classList.add('open');
+    }
+
+    function closePreview(){
+      const frame = document.getElementById('pdf-frame');
+      const modal = document.getElementById('modal');
+      frame.src = '';
+      modal.classList.remove('open');
+    }
+
+    document.getElementById('reload').addEventListener('click', ()=>fetchFiles());
+    document.getElementById('q').addEventListener('input', ()=>render());
+    document.getElementById('sort').addEventListener('change', ()=>render());
+    document.getElementById('modal-close').addEventListener('click', closePreview);
+    document.getElementById('modal').addEventListener('click', (e)=>{ if(e.target.id==='modal') closePreview(); });
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closePreview(); });
+
+    // initial
+    fetchFiles().catch(err=>{ document.getElementById('grid').innerHTML=''; document.getElementById('empty').style.display='block'; document.getElementById('stats').textContent='เกิดข้อผิดพลาด: '+err.message; });
   </script>
 </body>
 </html>

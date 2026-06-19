@@ -32,7 +32,4 @@ app.get('/api/files', async (req, res) => {
 // Serve PDFs at /pdfs/*
 app.use('/pdfs', express.static(PDF_DIR, { index: false }));
 
-app.listen(PORT, ()=>{
-  console.log(`Server running on http://localhost:${PORT}`);
-  console.log(`PDF folder: ${PDF_DIR}`);
-});
+module.exports = app;

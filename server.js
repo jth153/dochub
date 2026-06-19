@@ -10,6 +10,18 @@ const PDF_DIR = path.join(__dirname, 'pdfs');
 app.use(cors());
 app.use(express.static(path.join(__dirname)));
 
+
+app.use(cors());
+app.use(express.static(path.join(__dirname)));
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/api/files', async (req, res) => {
+  ...
+});
+
 app.get('/api/files', async (req, res) => {
   try{
     await fs.access(PDF_DIR);
@@ -28,6 +40,11 @@ app.get('/api/files', async (req, res) => {
     res.json(files);
   }catch(err){ res.status(500).json({error: err.message}); }
 });
+
+// Serve PDFs at /pdfs/*
+app.use('/pdfs', express.static(PDF_DIR, { index: false }));
+
+module.exports = app;
 
 // Serve PDFs at /pdfs/*
 app.use('/pdfs', express.static(PDF_DIR, { index: false }));
